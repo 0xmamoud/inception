@@ -1,12 +1,6 @@
 #!/bin/bash
 echo "Starting init-db.sh script..."
 
-# Afficher les variables d'environnement pour le débogage
-echo "$SQL_ROOT_PASSWORD ROOT PASSWORD"
-echo "$SQL_DATABASE DATABASE"
-echo "$SQL_USER USER"
-echo "$SQL_PASSWORD PASSWORD"
-
 # Démarrer le service MariaDB
 service mariadb start
 # Attendre que le serveur MariaDB soit pleinement opérationnel
@@ -20,7 +14,7 @@ mysql -e "CREATE DATABASE IF NOT EXISTS \`${SQL_DATABASE}\`;"
 echo "Database created."
 
 # Créer l'utilisateur
-mysql -e "CREATE USER IF NOT EXISTS '${SQL_USER}'@'localhost' IDENTIFIED BY '${SQL_PASSWORD}';"
+mysql -e "CREATE USER IF NOT EXISTS \`${SQL_USER}\`@'localhost' IDENTIFIED BY '${SQL_PASSWORD}';"
 echo "User created."
 
 # Attribuer les privilèges à l'utilisateur
@@ -28,15 +22,15 @@ mysql -e "GRANT ALL PRIVILEGES ON \`${SQL_DATABASE}\`.* TO '${SQL_USER}'@'%' IDE
 echo "Privileges granted."
 
 # Mettre à jour le mot de passe root
-mysql -e "ALTER USER 'root'@'localhost' IDENTIFIED BY '${SQL_ROOT_PASSWORD}';" || echo "Root password not updated."
+mysql -e "ALTER USER 'root'@'localhost' IDENTIFIED BY '${SQL_ROOT_PASSWORD}';"
 echo "Root password updated."
 
 # Rafraîchir les privilèges
-mysql -e "FLUSH PRIVILEGES;" || echo "Privileges not flushed."
+mysql -e "FLUSH PRIVILEGES;"
 echo "Privileges flushed."
 
 # Arrêter le serveur MySQL de façon contrôlée avec le mot de passe root
-mysqladmin -u root -p"$SQL_ROOT_PASSWORD" shutdown || echo "MySQL server not shut down."
+mysqladmin -u root -p$SQL_ROOT_PASSWORD shutdown
 echo "MySQL server shutting down."
 
 # Lancer le serveur MySQL en mode sûr
