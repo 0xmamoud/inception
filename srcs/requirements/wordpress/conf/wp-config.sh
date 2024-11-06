@@ -2,29 +2,36 @@
 
 sleep 10
 
-cd /var/www
+cd /var/www/wordpress
 
-wp config create	--allow-root \
-							--dbname=$SQL_DATABASE \
-							--dbuser=$SQL_USER \
-							--dbpass=$SQL_PASSWORD \
-							--dbhost=mariadb:3306 --path='/var/www/wordpress'
+# Vérifier si wp-config.php existe déjà
+if [ ! -f /var/www/wordpress/wp-config.php ]; then
+  # Créer le fichier wp-config.php
+  wp config create --allow-root \
+                    --dbname=$SQL_DATABASE \
+                    --dbuser=$SQL_USER \
+                    --dbpass=$SQL_PASSWORD \
+                    --dbhost=mariadb:3306 --path='/var/www/wordpress'
 
-wp core install	--allow-root \
-		    	--url=https://${SERVER_NAME} \
-		    	--title=${WP_SITE_TITLE} \
-		    	--admin_user=${WP_ADMIN_USER} \
-			    --admin_password=${WP_ADMIN_PASSWORD} \
-		    	--admin_email=${WP_ADMIN_EMAIL}
+  # Installer WordPress
+  wp core install --allow-root \
+                  --url=https://${SERVER_NAME} \
+                  --title=${WP_SITE_TITLE} \
+                  --admin_user=${WP_ADMIN_USER} \
+                  --admin_password=${WP_ADMIN_PASSWORD} \
+                  --admin_email=${WP_ADMIN_EMAIL}
 
-wp user create --allow-root \
-		      ${WP_USER} ${WP_USER_EMAIL} \
-			    --role=author \
-			    --user_pass=${WP_USER_PASSWORD} 
+  # Créer un utilisateur WordPress
+  wp user create ${WP_USER} ${WP_USER_EMAIL} \
+                 --role=author \
+                 --user_pass=${WP_USER_PASSWORD} \
+                 --allow-root
+else
+  echo "WordPress is already installed. Skipping installation."
 fi
 
-if [ ! -f /run/php/php7.4-fpm.sock ]; then
-  mkdir -p /run/php
-fi
+echo "WordPress configuration completed."
 
+# Lancer PHP-FPM
 exec php-fpm7.4 -F -R
+
