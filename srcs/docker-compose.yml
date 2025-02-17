@@ -28,7 +28,7 @@ services:
     restart: on-failure
     depends_on:
       - wordpress
-  
+
   wordpress:
     container_name: wordpress
     networks:
@@ -50,14 +50,14 @@ volumes:
     driver: local
     driver_opts:
       type: none
-      o: 'bind'
-      device: /Users/mamoud/data/mariadb
+      o: "bind"
+      device: ${HOME}/data/mariadb
   wordpress:
     driver: local
     driver_opts:
       type: none
-      o: 'bind'
-      device: /Users/mamoud/data/wordpress
+      o: "bind"
+      device: ${HOME}/data/wordpress
 
 networks:
   inception:
