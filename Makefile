@@ -15,9 +15,8 @@ all: setup build up
 # Setup directories and hosts
 setup:
 	@printf "$(GREEN)Setting up project...$(RESET)\n"
-	@mkdir -p $(DATA_PATH) || true
-	@mkdir -p $(VOLUME_WP) || true
-	@mkdir -p $(VOLUME_DB) || true
+	@mkdir -p $(VOLUME_WP) 
+	@mkdir -p $(VOLUME_DB) 
 	@if ! grep -q "mkane.42.fr" /etc/hosts; then \
 		sudo sh -c 'echo "127.0.0.1 mkane.42.fr" >> /etc/hosts'; \
 	fi
@@ -46,8 +45,11 @@ clean: down
 # Full cleanup including volumes
 fclean: clean
 	@printf "$(RED)Full cleanup including volumes...$(RESET)\n"
-	@rm -rf $(DATA_PATH)
 	@docker volume prune -f
+	@docker volume rm mariadb
+	@docker volume rm wordpress
+	@rm -rf $(VOLUME_WP)
+	@rm -rf $(VOLUME_DB)
 
 # Restart services
 re: fclean all
